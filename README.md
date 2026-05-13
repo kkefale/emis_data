@@ -1,6 +1,6 @@
 # SA EMIS — National Schools Intelligence Dashboard
 
-**Version 1.3.0** · South African Department of Basic Education · 2025 Data Year
+**Version 1.4.0** · South African Department of Basic Education · 2025 Data Year
 
 An interactive data exploration dashboard for the South African National Education Management Information System (EMIS). Covers **25,527 schools** across all nine provinces with cross-filtering, a geospatial map, and full dark/light mode support.
 
@@ -187,6 +187,17 @@ CSS variables are defined in a single `:root` block and overridden wholesale by 
 ---
 
 ## Changelog
+
+### v1.4.0 — 2026-05-13
+- Mobile responsive layout: `@media (max-width: 768px)` rules added to global CSS
+  - Sidebar set to `auto` collapse (hamburger menu on mobile)
+  - KPI grid collapses from 6-column single row to 2-column × 3-row grid
+  - KPI value font size reduced (`2rem` → `1.45rem`) on narrow screens
+  - Header stacks title and subtitle vertically on mobile
+  - Section 02 two-column chart row (sunburst + donut) stacks to full-width single column
+  - Footer stacks and centres its two spans on mobile
+  - Outer padding tightened to `0.75rem` on mobile
+- Map chart given explicit `height: 480px`
 
 ### v1.3.0 — 2026-05-13
 - Section 02 layout changed from 3-column cramped row to 2-row layout (sunburst + donut side-by-side, LER scatter full-width)

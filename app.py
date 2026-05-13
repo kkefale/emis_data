@@ -27,7 +27,7 @@ st.set_page_config(
     page_title = "SA EMIS Explorer",
     page_icon  = "🎓",
     layout     = "wide",
-    initial_sidebar_state = "expanded",
+    initial_sidebar_state = "auto",
 )
 
 # ── Global CSS ────────────────────────────────────────────────────────────────
@@ -224,6 +224,70 @@ html, body, [class*="css"] {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     border: 1px solid var(--border);
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    /* Tighter outer padding */
+    .block-container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 0.75rem !important;
+    }
+
+    /* Header: stack label under title */
+    .emis-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+        padding: 1.1rem 0 1.1rem;
+        margin-bottom: 1.25rem;
+    }
+    .emis-header h1 { font-size: 1.1rem; }
+
+    /* KPI grid: 2 columns × 3 rows */
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .kpi-card {
+        padding: 1rem 0.85rem 0.85rem;
+    }
+    .kpi-value {
+        font-size: 1.45rem;
+    }
+
+    /* Section title: reduce letter-spacing so it doesn't overflow */
+    .sec-title {
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        margin: 1.75rem 0 0.75rem;
+    }
+
+    /* Stack all Streamlit 2-col rows into a single column */
+    [data-testid="stHorizontalBlock"] {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+    [data-testid="stColumn"],
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+
+    /* Reduce chart border weight */
+    [data-testid="stPlotlyChart"] {
+        border-width: 1px;
+    }
+
+    /* Footer: stack vertically and centre */
+    .emis-footer {
+        flex-direction: column;
+        gap: 0.4rem;
+        text-align: center;
+        margin-top: 2.5rem;
+        padding: 1.5rem 0;
+    }
 }
 </style>
 """,

@@ -207,7 +207,8 @@ def scatter_map(df: pd.DataFrame, color_by: str = "Quintile", dark: bool = True)
             center = dict(lat=-29.0, lon=25.0),
             zoom   = 4.8,
         ),
-        uirevision="map",
+        uirevision = "map",
+        height     = 480,
     )
     return fig
 
