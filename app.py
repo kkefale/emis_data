@@ -34,32 +34,65 @@ st.set_page_config(
 st.markdown(
     """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+    --bg:        #0c0c0f;
+    --surface:   #111116;
+    --surface2:  #17171e;
+    --signal:    #4d9fff;
+    --signal-d:  rgba(77, 159, 255, 0.12);
+    --border:    rgba(255, 255, 255, 0.07);
+    --text:      #f0f0f0;
+    --text-2:    #8a8fa8;
+    --text-3:    #3d4352;
+    --red:       #e05252;
+    --amber:     #d4a843;
+    --green:     #4eba7f;
+}
+
+html, body, [class*="css"] {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif !important;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+.stApp {
+    background-color: var(--bg);
+}
+
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
 .block-container {
-    padding-top: 0.75rem !important;
+    padding-top: 2rem !important;
     padding-bottom: 2rem !important;
     max-width: 100% !important;
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 .emis-header {
-    text-align: center;
-    padding: 1.2rem 0 0.6rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 2rem 0 1.75rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
 }
 .emis-header h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #c084fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0 0 0.3rem;
+    font-family: 'IBM Plex Sans', sans-serif !important;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 0;
+}
+.emis-header h1 span {
+    color: var(--signal);
 }
 .emis-header p {
-    color: #64748b;
-    font-size: 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-3);
     margin: 0;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
@@ -67,145 +100,130 @@ st.markdown(
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 0.85rem;
-    margin: 1rem 0 1.4rem;
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
 }
 .kpi-card {
-    background: linear-gradient(
-        135deg,
-        rgba(99, 102, 241, 0.13) 0%,
-        rgba(139, 92, 246, 0.07) 100%
-    );
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(99, 102, 241, 0.22);
-    border-radius: 16px;
-    padding: 1.15rem 0.75rem;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: default;
+    background: var(--surface);
+    border-left: 3px solid var(--signal);
+    padding: 1.4rem 1.2rem 1.2rem;
+    transition: background 0.2s ease;
 }
-.kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 36px rgba(99, 102, 241, 0.22);
-}
-.kpi-card.accent {
-    background: linear-gradient(
-        135deg,
-        rgba(236, 72, 153, 0.16) 0%,
-        rgba(244, 63, 94, 0.09) 100%
-    );
-    border-color: rgba(236, 72, 153, 0.28);
-}
-.kpi-card.accent:hover { box-shadow: 0 18px 36px rgba(236, 72, 153, 0.22); }
-.kpi-card.green {
-    background: linear-gradient(
-        135deg,
-        rgba(34, 197, 94, 0.16) 0%,
-        rgba(20, 184, 166, 0.08) 100%
-    );
-    border-color: rgba(34, 197, 94, 0.28);
-}
-.kpi-card.green:hover { box-shadow: 0 18px 36px rgba(34, 197, 94, 0.22); }
-.kpi-card.red {
-    background: linear-gradient(
-        135deg,
-        rgba(239, 68, 68, 0.16) 0%,
-        rgba(220, 38, 38, 0.08) 100%
-    );
-    border-color: rgba(239, 68, 68, 0.28);
-}
-.kpi-card.red:hover { box-shadow: 0 18px 36px rgba(239, 68, 68, 0.22); }
-.kpi-icon  { font-size: 1.65rem; margin-bottom: 0.4rem; line-height: 1; }
+.kpi-card:hover { background: var(--surface2); }
+.kpi-card.accent { border-left-color: var(--amber); }
+.kpi-card.green  { border-left-color: var(--green); }
+.kpi-card.red    { border-left-color: var(--red); }
+
 .kpi-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #f1f5f9;
-    letter-spacing: -0.03em;
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
     line-height: 1;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 .kpi-label {
-    font-size: 0.72rem;
-    color: #64748b;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-2);
     text-transform: uppercase;
-    letter-spacing: 0.09em;
-    font-weight: 600;
+    letter-spacing: 0.1em;
+    font-weight: 400;
 }
 
 /* ─── Section title ──────────────────────────────────────────────────────── */
 .sec-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #a5b4fc;
-    margin: 1rem 0 0.4rem;
-    padding-left: 0.1rem;
-    letter-spacing: 0.02em;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin: 2.5rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.sec-title::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--signal);
+}
+.sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
 }
 
-/* ─── Chart cards (wraps plotly iframes) ────────────────────────────────── */
+/* ─── Chart wrappers ─────────────────────────────────────────────────────── */
 [data-testid="stPlotlyChart"] {
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(19, 19, 31, 0.55);
-    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    background: var(--surface);
 }
 
 /* ─── Sidebar ─────────────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0c0c1a 0%, #13131f 100%) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    background: var(--bg) !important;
+    border-right: 1px solid var(--border) !important;
 }
 [data-testid="stSidebarContent"] {
-    padding-top: 1.5rem;
+    padding-top: 2rem;
 }
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {
-    color: #818cf8;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', monospace !important;
+    color: var(--text-2);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.25);
-    padding-bottom: 0.6rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 [data-testid="stSidebar"] label {
-    color: #64748b !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    color: var(--text-3) !important;
+    font-size: 0.68rem !important;
+    font-weight: 400 !important;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.1em;
 }
 [data-testid="stSidebar"] hr {
-    border-color: rgba(255,255,255,0.07);
-    margin: 0.9rem 0;
-}
-
-/* ─── Divider ─────────────────────────────────────────────────────────────── */
-.emis-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
-    margin: 1.2rem 0;
+    border-color: var(--border);
+    margin: 1.5rem 0;
 }
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 .emis-footer {
-    text-align: center;
-    color: #334155;
-    font-size: 0.76rem;
-    padding: 2rem 0 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    margin-top: 2rem;
-    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-3);
+    padding: 2rem 0 2rem;
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    letter-spacing: 0.06em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* ─── Empty state ────────────────────────────────────────────────────────── */
 .emis-empty {
+    font-family: 'IBM Plex Mono', monospace;
     text-align: center;
-    padding: 3rem;
-    color: #475569;
-    font-size: 0.9rem;
+    padding: 4rem 2rem;
+    color: var(--text-3);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
 }
 </style>
 """,
@@ -278,6 +296,50 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Data: SA EMIS 2025 · Schools with OPEN status only")
 
+    st.markdown("---")
+    light_mode = st.toggle("Light mode", value=False, key="theme_toggle")
+
+
+# ── Theme override (injected after sidebar so light_mode is available) ────────
+if light_mode:
+    st.markdown(
+        """
+<style>
+:root {
+    --bg:        #f4f5f7;
+    --surface:   #ffffff;
+    --surface2:  #eaecef;
+    --signal:    #1d6ed8;
+    --signal-d:  rgba(29, 110, 216, 0.10);
+    --border:    rgba(0, 0, 0, 0.09);
+    --text:      #111827;
+    --text-2:    #4b5563;
+    --text-3:    #9ca3af;
+    --red:       #dc2626;
+    --amber:     #b45309;
+    --green:     #16a34a;
+}
+.stApp { background-color: var(--bg) !important; }
+[data-testid="stSidebar"] {
+    background: var(--bg) !important;
+    border-right: 1px solid var(--border) !important;
+}
+[data-testid="stPlotlyChart"] {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+}
+/* Streamlit native widget backgrounds */
+[data-baseweb="select"] > div,
+[data-baseweb="input"] > div {
+    background-color: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+[data-baseweb="popover"] { background-color: var(--surface) !important; }
+</style>
+""",
+        unsafe_allow_html=True,
+    )
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 with st.spinner("Loading data…"):
@@ -293,8 +355,8 @@ with st.spinner("Loading data…"):
 st.markdown(
     """
     <div class="emis-header">
-      <h1>🎓 SA EMIS National Dashboard</h1>
-      <p>South African Education Management Information System &nbsp;·&nbsp; 2025 Data Year</p>
+      <h1>SA EMIS &mdash; <span>National Schools Intelligence</span></h1>
+      <p>Dept. of Basic Education &middot; 2025 Data Year</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -312,34 +374,28 @@ st.markdown(
     f"""
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-icon">🏫</div>
-        <div class="kpi-value">{kpis["total_schools"]:,}</div>
-        <div class="kpi-label">Total Schools</div>
+        <span class="kpi-value">{kpis["total_schools"]:,}</span>
+        <span class="kpi-label">Schools</span>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon">👨‍🎓</div>
-        <div class="kpi-value">{kpis["total_learners"]:,}</div>
-        <div class="kpi-label">Total Learners</div>
+        <span class="kpi-value">{kpis["total_learners"]:,}</span>
+        <span class="kpi-label">Learners</span>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon">👩‍🏫</div>
-        <div class="kpi-value">{kpis["total_educators"]:,}</div>
-        <div class="kpi-label">Total Educators</div>
+        <span class="kpi-value">{kpis["total_educators"]:,}</span>
+        <span class="kpi-label">Educators</span>
       </div>
       <div class="kpi-card accent">
-        <div class="kpi-icon">📊</div>
-        <div class="kpi-value">{kpis["national_ler"]}</div>
-        <div class="kpi-label">Avg. LER (national)</div>
+        <span class="kpi-value">{kpis["national_ler"]}</span>
+        <span class="kpi-label">Learner / Educator Ratio</span>
       </div>
       <div class="kpi-card green">
-        <div class="kpi-icon">🆓</div>
-        <div class="kpi-value">{kpis["no_fee_pct"]}%</div>
-        <div class="kpi-label">No-Fee Schools</div>
+        <span class="kpi-value">{kpis["no_fee_pct"]}%</span>
+        <span class="kpi-label">No-Fee Schools</span>
       </div>
       <div class="kpi-card red">
-        <div class="kpi-icon">⚠️</div>
-        <div class="kpi-value">{kpis["critical_count"]:,}</div>
-        <div class="kpi-label">Critical LER (&gt;40)</div>
+        <span class="kpi-value">{kpis["critical_count"]:,}</span>
+        <span class="kpi-label">Critical LER &gt; 40</span>
       </div>
     </div>
     """,
@@ -347,59 +403,54 @@ st.markdown(
 )
 
 # ── Map ───────────────────────────────────────────────────────────────────────
-st.markdown('<div class="sec-title">📍 School Locations</div>', unsafe_allow_html=True)
+st.markdown('<div class="sec-title">01 &mdash; School Locations</div>', unsafe_allow_html=True)
 st.plotly_chart(
-    scatter_map(df, color_by=color_by),
-    use_container_width = True,
+    scatter_map(df, color_by=color_by, dark=not light_mode),
+    width="stretch",
     config = {"displayModeBar": True, "scrollZoom": True,
               "modeBarButtonsToRemove": ["select2d", "lasso2d"]},
 )
 
-st.markdown('<div class="emis-divider"></div>', unsafe_allow_html=True)
-
 # ── Analysis row (3 columns) ──────────────────────────────────────────────────
-st.markdown('<div class="sec-title">🔬 Socio-Economic & Resource Analysis</div>',
+st.markdown('<div class="sec-title">02 &mdash; Socio-Economic &amp; Resource Analysis</div>',
             unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
 
 with col1:
     st.plotly_chart(
-        sunburst_province_quintile(df),
-        use_container_width = True,
+        sunburst_province_quintile(df, dark=not light_mode),
+        width="stretch",
         config = {"displayModeBar": False},
     )
 
 with col2:
     st.plotly_chart(
-        donut_no_fee_by_sector(df),
-        use_container_width = True,
+        donut_no_fee_by_sector(df, dark=not light_mode),
+        width="stretch",
         config = {"displayModeBar": False},
     )
 
 with col3:
     st.plotly_chart(
-        ler_scatter(df),
-        use_container_width = True,
+        ler_scatter(df, dark=not light_mode),
+        width="stretch",
         config = {"displayModeBar": False},
     )
 
-st.markdown('<div class="emis-divider"></div>', unsafe_allow_html=True)
-
 # ── Province comparison bar ───────────────────────────────────────────────────
-st.markdown('<div class="sec-title">🗺️ Province Comparison</div>', unsafe_allow_html=True)
+st.markdown('<div class="sec-title">03 &mdash; Province Comparison</div>', unsafe_allow_html=True)
 st.plotly_chart(
-    province_bar(df, metric=prov_metric),
-    use_container_width = True,
+    province_bar(df, metric=prov_metric, dark=not light_mode),
+    width="stretch",
     config = {"displayModeBar": False},
 )
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown(
     "<div class='emis-footer'>"
-    "South African EMIS · 2025 Data Year · "
-    "Dashboard built with Streamlit &amp; Plotly · "
-    "Source: Department of Basic Education"
+    "<span>SA EMIS &mdash; 2025 Data Year</span>"
+    "<span>Source: Department of Basic Education</span>"
     "</div>",
     unsafe_allow_html=True,
 )
