@@ -245,9 +245,9 @@ def sunburst_province_quintile(df: pd.DataFrame, dark: bool = True) -> go.Figure
     title_color = "#f0f0f0" if dark else "#111827"
     fig.update_layout(
         **_make_layout(dark),
-        title  = dict(text="Schools by Province & Quintile", font_size=14, x=0.5,
-                      font_color=title_color),
-        height = 460,
+        title  = dict(text="Schools by Province & Quintile", font_size=14,
+                      x=0.5, xanchor="center", font_color=title_color),
+        height = 450,
     )
     return fig
 
@@ -289,12 +289,25 @@ def donut_no_fee_by_sector(df: pd.DataFrame, dark: bool = True) -> go.Figure:
         )
 
     title_color = "#f0f0f0" if dark else "#111827"
-    ann_color   = "#3d4352" if dark else "#374151"
+    ann_color   = "#9ca3af" if dark else "#4b5563"
+    text_color  = "#f0f0f0" if dark else "#111827"
     fig.update_layout(
         **_make_layout(dark),
-        title  = dict(text="No-Fee vs Fee-Charging by Sector", font_size=14, x=0.5,
-                      font_color=title_color),
-        height = 460,
+        title  = dict(text="No-Fee vs Fee-Charging by Sector", font_size=14,
+                      x=0.5, xanchor="center", font_color=title_color),
+        height = 450,
+    )
+    fig.update_layout(
+        legend = dict(
+            orientation = "h",
+            x           = 0.5,
+            xanchor     = "center",
+            y           = -0.08,
+            yanchor     = "top",
+            bgcolor     = "rgba(0,0,0,0)",
+            borderwidth = 0,
+            font        = dict(size=11, color=text_color),
+        ),
     )
     # Style subplot titles
     for ann in fig.layout.annotations:
@@ -354,11 +367,11 @@ def ler_scatter(df: pd.DataFrame, dark: bool = True) -> go.Figure:
     title_color = "#f0f0f0" if dark else "#111827"
     fig.update_layout(
         **_make_layout(dark),
-        title       = dict(text="Learner-to-Educator Ratio", font_size=14, x=0.5,
-                           font_color=title_color),
+        title       = dict(text="Learner-to-Educator Ratio", font_size=14,
+                           x=0.5, xanchor="center", font_color=title_color),
         xaxis_title = "Educators",
         yaxis_title = "Learners",
-        height      = 400,
+        height      = 450,
     )
     _style_axes(fig, dark)
     return fig
@@ -407,16 +420,79 @@ def province_bar(df: pd.DataFrame, metric: str = "Learners2025", dark: bool = Tr
         ),
         text          = agg[y_col].apply(lambda v: f"{v:,.0f}"),
         textposition  = "outside",
-        textfont      = dict(color="#3d4352" if dark else "#374151", size=11),
+        textfont      = dict(color="#9ca3af" if dark else "#374151", size=11),
         cliponaxis    = False,
     ))
 
     title_color = "#f0f0f0" if dark else "#111827"
     fig.update_layout(
         **_make_layout(dark),
-        title   = dict(text=f"{y_col} per Province", font_size=14, x=0.5,
-                       font_color=title_color),
+        title   = dict(text=f"{y_col} per Province", font_size=14,
+                       x=0.5, xanchor="center", font_color=title_color),
         xaxis   = dict(range=[0, max_val * 1.18]),
+    )
+    _style_axes(fig, dark)
+    return fig
+
+
+# ── 7. LER by Quintile bar ──────────────────────────────────────────────────
+def quintile_ler_bar(df: pd.DataFrame, dark: bool = True) -> go.Figure:
+    """Shows how the Learner-to-Educator Ratio varies across wealth quintiles."""
+    # Filter out 'Other' for a cleaner Q1-Q5 comparison
+    sdf = df[df["Quintile"].isin(["Q1", "Q2", "Q3", "Q4", "Q5"])].copy()
+    
+    agg = (
+        sdf.groupby("Quintile", observed=True)
+        .agg(
+            Schools   = ("NatEmis",       "count"),
+            Learners  = ("Learners2025",  "sum"),
+            Educators = ("Educators2025", "sum"),
+        )
+        .reset_index()
+    )
+    agg["LER"] = (agg["Learners"] / agg["Educators"]).round(1)
+    # Sort intentionally Q1 -> Q5 so the poverty spectrum is left-to-right
+    agg = agg.sort_values("Quintile")
+
+    fig = go.Figure(go.Bar(
+        x          = agg["Quintile"],
+        y          = agg["LER"],
+        marker     = dict(
+            color = [QUINTILE_COLORS.get(q, "#94a3b8") for q in agg["Quintile"]]
+        ),
+        customdata  = agg[["Schools", "Learners", "Educators"]].values,
+        hovertemplate = (
+            "<b>%{x}</b><br>"
+            "LER: <b>%{y}</b><br>"
+            "Schools: %{customdata[0]:,}<br>"
+            "Learners: %{customdata[1]:,.0f}<br>"
+            "Educators: %{customdata[2]:,.0f}"
+            "<extra></extra>"
+        ),
+        text          = agg["LER"],
+        textposition  = "outside",
+        textfont      = dict(color="#9ca3af" if dark else "#374151", size=11),
+        cliponaxis    = False,
+    ))
+
+    # Add reference line for national target/strain (LER=30)
+    fig.add_hline(
+        y=30, 
+        line_dash="dot", 
+        line_color="rgba(255,255,255,0.3)" if dark else "rgba(0,0,0,0.3)",
+        annotation_text="LER Target (30)",
+        annotation_position="bottom right",
+        annotation_font_color="#8a8fa8" if dark else "#6b7280"
+    )
+
+    title_color = "#f0f0f0" if dark else "#111827"
+    fig.update_layout(
+        **_make_layout(dark),
+        title   = dict(text="Average LER by Wealth Quintile (Q1=Poorest)", font_size=14,
+                       x=0.5, xanchor="center", font_color=title_color),
+        yaxis   = dict(range=[0, agg["LER"].max() * 1.15], title="Learner/Educator Ratio"),
+        xaxis_title = None,
+        height  = 450,
     )
     _style_axes(fig, dark)
     return fig

@@ -1,6 +1,6 @@
 # SA EMIS — National Schools Intelligence Dashboard
 
-**Version 1.4.0** · South African Department of Basic Education · 2025 Data Year
+**Version 1.5.0** · South African Department of Basic Education · 2025 Data Year
 
 An interactive data exploration dashboard for the South African National Education Management Information System (EMIS). Covers **25,527 schools** across all nine provinces with cross-filtering, a geospatial map, and full dark/light mode support.
 
@@ -27,10 +27,12 @@ Six live metric cards update instantly with every filter change:
 - Hover tooltips: school name, district, learners, educators, derived LER
 
 ### 02 — Socio-Economic & Resource Analysis
+This section acts as a key narrative piece, highlighting the deep inequalities present in the system, specifically aligned to South Africa's poverty Quintiles.
 
 | Chart | What it shows |
 |-------|---------------|
 | Sunburst (Province → Quintile) | School count hierarchy; sized by school count, coloured by quintile |
+| LER by Quintile Bar | Exposes the resource gap by showing stacked LER rates from Quintile 1 (poorest) through Quintile 5 |
 | Dual Donut (No-Fee by Sector) | No-Fee vs Fee-Charging split for Public vs Independent sectors |
 | LER Scatter | Learners vs Educators scatter with LER = 30 and LER = 40 reference lines; colour-coded by strain level |
 
@@ -44,6 +46,10 @@ All charts respond simultaneously to:
 - Sector (Public / Independent)
 - School Phase (Primary, Secondary, Combined, …)
 - Quintile (Q1 – Q5)
+- Urban / Rural (Derived location classification)
+
+### Story Mode
+Users can toggle **"📖 Enable Story Mode"** from the sidebar to transform the dashboard into a data journalism piece. This injects curated narrative blocks right above visualizations to guide users through the implications of spatial inequality, resource strain, and poverty in the SA education system.
 
 ### Dark / Light Mode
 Toggle in the sidebar switches the full interface — shell, charts, and map — between a precision dark theme and a high-contrast light theme.

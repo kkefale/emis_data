@@ -58,6 +58,7 @@ def _build_where(
     sectors: tuple,
     phases: tuple,
     quintiles: tuple,
+    urban_rural: tuple,
 ) -> tuple[str, list]:
     """Return (WHERE clause string, params list) for the normalised sub-query."""
     conditions: list[str] = []
@@ -74,6 +75,7 @@ def _build_where(
     _add("Sector",    sectors)
     _add("Phase_PED", phases)
     _add("Quintile",  quintiles)
+    _add("Urban_Rural", urban_rural)
 
     return (" AND ".join(conditions), params)
 
@@ -86,6 +88,7 @@ def load_filtered_data(
     sectors:   tuple | None = None,
     phases:    tuple | None = None,
     quintiles: tuple | None = None,
+    urban_rural: tuple | None = None,
 ) -> pd.DataFrame:
     """
     Load schools from the DB with optional filters applied.
@@ -93,11 +96,12 @@ def load_filtered_data(
     Returns a clean DataFrame with derived LER columns appended.
     """
     where_clause, params = _build_where(
-        provinces  or (),
-        districts  or (),
-        sectors    or (),
-        phases     or (),
-        quintiles  or (),
+        provinces   or (),
+        districts   or (),
+        sectors     or (),
+        phases      or (),
+        quintiles   or (),
+        urban_rural or (),
     )
     sql = f"SELECT * FROM ({_NORM_SQL})"
     if where_clause:

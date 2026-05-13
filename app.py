@@ -20,6 +20,7 @@ from charts import (
     donut_no_fee_by_sector,
     ler_scatter,
     province_bar,
+    quintile_ler_bar,
 )
 
 # ── Page config (must be first Streamlit call) ────────────────────────────────
@@ -226,6 +227,24 @@ html, body, [class*="css"] {
     border: 1px solid var(--border);
 }
 
+/* ─── Story block ────────────────────────────────────────────────────────── */
+.story-block {
+    background: var(--surface);
+    border-left: 4px solid var(--signal);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.story-block strong {
+    color: var(--signal);
+    font-weight: 600;
+}
+
 /* ─── Mobile ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     /* Tighter outer padding */
@@ -337,6 +356,13 @@ with st.sidebar:
         key         = "f_quintile",
     )
 
+    sel_urban_rural = st.multiselect(
+        "Urban / Rural",
+        options     = ["Urban", "Rural"],
+        placeholder = "All locations",
+        key         = "f_urban_rural",
+    )
+
     st.markdown("---")
     st.markdown("**Map options**")
     color_by = st.radio(
@@ -361,6 +387,7 @@ with st.sidebar:
     st.caption("Data: SA EMIS 2025 · Schools with OPEN status only")
 
     st.markdown("---")
+    story_mode = st.toggle("📖 Enable Story Mode", value=False, key="story_mode_toggle")
     light_mode = st.toggle("Light mode", value=False, key="theme_toggle")
 
 
@@ -490,6 +517,10 @@ if light_mode:
 /* ── Empty state ── */
 .emis-empty { color: #6b7280 !important; border-color: rgba(0,0,0,0.09) !important; }
 
+/* ── Story Block ── */
+.story-block { background: #ffffff !important; border-left-color: #1d6ed8 !important; color: #111827 !important; }
+.story-block strong { color: #1d6ed8 !important; }
+
 /* ── Chart wrapper ── */
 [data-testid="stPlotlyChart"] {
     background: #ffffff !important;
@@ -506,11 +537,12 @@ if light_mode:
 # ── Load data ─────────────────────────────────────────────────────────────────
 with st.spinner("Loading data…"):
     df = load_filtered_data(
-        provinces = tuple(sel_provinces) if sel_provinces else None,
-        districts = tuple(sel_districts) if sel_districts else None,
-        sectors   = tuple(sel_sectors)   if sel_sectors   else None,
-        phases    = tuple(sel_phases)    if sel_phases     else None,
-        quintiles = tuple(sel_quintiles) if sel_quintiles  else None,
+        provinces   = tuple(sel_provinces)   if sel_provinces   else None,
+        districts   = tuple(sel_districts)   if sel_districts   else None,
+        sectors     = tuple(sel_sectors)     if sel_sectors     else None,
+        phases      = tuple(sel_phases)      if sel_phases      else None,
+        quintiles   = tuple(sel_quintiles)   if sel_quintiles   else None,
+        urban_rural = tuple(sel_urban_rural) if sel_urban_rural else None,
     )
 
 # ── Header ────────────────────────────────────────────────────────────────────
@@ -566,6 +598,18 @@ st.markdown(
 
 # ── Map ───────────────────────────────────────────────────────────────────────
 st.markdown('<div class="sec-title">01 &mdash; School Locations</div>', unsafe_allow_html=True)
+
+if story_mode:
+    st.markdown(
+        '<div class="story-block">'
+        '<strong>The Geographic Divide:</strong> Spatial inequality remains a defining feature of South Africa’s education landscape. '
+        'Notice the dense clustering of well-resourced schools (Quintile 4 & 5) in urban hubs like Gauteng and the Western Cape, '
+        'contrasting starkly with the vast expanse of poorer, No-Fee schools in rural areas like the Eastern Cape and KwaZulu-Natal. '
+        '<em>Try filtering by "Rural" in the sidebar to visualize this intersection of poverty and geography.</em>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
 st.plotly_chart(
     scatter_map(df, color_by=color_by, dark=not light_mode),
     width="stretch",
@@ -577,11 +621,27 @@ st.plotly_chart(
 st.markdown('<div class="sec-title">02 &mdash; Socio-Economic &amp; Resource Analysis</div>',
             unsafe_allow_html=True)
 
+if story_mode:
+    st.markdown(
+        '<div class="story-block">'
+        '<strong>The Legacy of Inequality:</strong> South Africa categorises public schools into poverty "Quintiles" to determine funding allocations. '
+        'Yet, structural disparities persist. In the charts below, observe how <strong>Quintile 1-3 schools (the poorest) overwhelmingly bear the brunt of overcrowding</strong>. '
+        'They systematically display higher Learner-to-Educator Ratios than the wealthiest schools in Quintile 5. '
+        'This deep resource gap remains a primary driver of disparate educational outcomes.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
 col1, col2 = st.columns(2, gap="large")
 
 with col1:
     st.plotly_chart(
         sunburst_province_quintile(df, dark=not light_mode),
+        width="stretch",
+        config = {"displayModeBar": False},
+    )
+    st.plotly_chart(
+        quintile_ler_bar(df, dark=not light_mode),
         width="stretch",
         config = {"displayModeBar": False},
     )
@@ -592,15 +652,25 @@ with col2:
         width="stretch",
         config = {"displayModeBar": False},
     )
-
-st.plotly_chart(
-    ler_scatter(df, dark=not light_mode),
-    width="stretch",
-    config = {"displayModeBar": False},
-)
+    st.plotly_chart(
+        ler_scatter(df, dark=not light_mode),
+        width="stretch",
+        config = {"displayModeBar": False},
+    )
 
 # ── Province comparison bar ───────────────────────────────────────────────────
 st.markdown('<div class="sec-title">03 &mdash; Province Comparison</div>', unsafe_allow_html=True)
+
+if story_mode:
+    st.markdown(
+        '<div class="story-block">'
+        '<strong>Provincial Strain:</strong> Demographics and resources are deeply uneven across provincial lines. '
+        'Populous or heavily rural provinces frequently manage massive learner populations with constrained educator numbers, '
+        'pushing their limits far beyond wealthier, urbanized jurisdictions.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
 st.plotly_chart(
     province_bar(df, metric=prov_metric, dark=not light_mode),
     width="stretch",
