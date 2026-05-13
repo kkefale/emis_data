@@ -58,16 +58,26 @@ _FONT  = "IBM Plex Mono, monospace"
 def _make_layout(dark: bool = True) -> dict:
     """Return a Plotly layout dict tuned for dark or light mode."""
     if dark:
-        text   = "#f0f0f0"
-        leg_bg = "rgba(17,17,22,0.9)"
-        leg_bd = "rgba(255,255,255,0.07)"
+        text     = "#f0f0f0"
+        leg_bg   = "rgba(17,17,22,0.9)"
+        leg_bd   = "rgba(255,255,255,0.07)"
+        paper_bg = "rgba(0,0,0,0)"
+        plot_bg  = "rgba(0,0,0,0)"
+        hov_bg   = "rgba(12,12,15,0.97)"
+        hov_bd   = "rgba(255,255,255,0.12)"
+        hov_txt  = "#f0f0f0"
     else:
-        text   = "#111827"
-        leg_bg = "rgba(255,255,255,0.95)"
-        leg_bd = "rgba(0,0,0,0.10)"
+        text     = "#111827"
+        leg_bg   = "rgba(255,255,255,0.97)"
+        leg_bd   = "rgba(0,0,0,0.10)"
+        paper_bg = "#ffffff"
+        plot_bg  = "#f8fafc"
+        hov_bg   = "#ffffff"
+        hov_bd   = "rgba(0,0,0,0.12)"
+        hov_txt  = "#111827"
     return dict(
-        paper_bgcolor = "rgba(0,0,0,0)",
-        plot_bgcolor  = "rgba(0,0,0,0)",
+        paper_bgcolor = paper_bg,
+        plot_bgcolor  = plot_bg,
         font          = dict(family=_FONT, color=text, size=11),
         margin        = dict(t=44, r=16, b=28, l=16),
         legend        = dict(
@@ -75,6 +85,12 @@ def _make_layout(dark: bool = True) -> dict:
             bordercolor = leg_bd,
             borderwidth = 1,
             font_size   = 11,
+            font_color  = text,
+        ),
+        hoverlabel = dict(
+            bgcolor     = hov_bg,
+            bordercolor = hov_bd,
+            font        = dict(family=_FONT, color=hov_txt, size=11),
         ),
     )
 
@@ -85,8 +101,8 @@ def _style_axes(fig: go.Figure, dark: bool = True) -> go.Figure:
         muted = "#3d4352"
     else:
         grid  = "rgba(0,0,0,0.07)"
-        line  = "rgba(0,0,0,0.12)"
-        muted = "#6b7280"
+        line  = "rgba(0,0,0,0.15)"
+        muted = "#374151"
     axis_style = dict(
         gridcolor     = grid,
         zerolinecolor = "rgba(0,0,0,0)",
@@ -221,14 +237,16 @@ def sunburst_province_quintile(df: pd.DataFrame, dark: bool = True) -> go.Figure
             "<extra></extra>"
         ),
         textfont_size          = 11,
+        textfont_color         = "#111827" if not dark else "#f0f0f0",
         insidetextorientation  = "radial",
         leaf_opacity           = 0.88,
     )
     title_color = "#f0f0f0" if dark else "#111827"
     fig.update_layout(
         **_make_layout(dark),
-        title = dict(text="Schools by Province & Quintile", font_size=14, x=0.5,
-                     font_color=title_color),
+        title  = dict(text="Schools by Province & Quintile", font_size=14, x=0.5,
+                      font_color=title_color),
+        height = 460,
     )
     return fig
 
@@ -270,11 +288,12 @@ def donut_no_fee_by_sector(df: pd.DataFrame, dark: bool = True) -> go.Figure:
         )
 
     title_color = "#f0f0f0" if dark else "#111827"
-    ann_color   = "#3d4352" if dark else "#6b7280"
+    ann_color   = "#3d4352" if dark else "#374151"
     fig.update_layout(
         **_make_layout(dark),
         title  = dict(text="No-Fee vs Fee-Charging by Sector", font_size=14, x=0.5,
                       font_color=title_color),
+        height = 460,
     )
     # Style subplot titles
     for ann in fig.layout.annotations:
@@ -338,6 +357,7 @@ def ler_scatter(df: pd.DataFrame, dark: bool = True) -> go.Figure:
                            font_color=title_color),
         xaxis_title = "Educators",
         yaxis_title = "Learners",
+        height      = 400,
     )
     _style_axes(fig, dark)
     return fig
@@ -386,7 +406,7 @@ def province_bar(df: pd.DataFrame, metric: str = "Learners2025", dark: bool = Tr
         ),
         text          = agg[y_col].apply(lambda v: f"{v:,.0f}"),
         textposition  = "outside",
-        textfont      = dict(color="#3d4352" if dark else "#6b7280", size=11),
+        textfont      = dict(color="#3d4352" if dark else "#374151", size=11),
         cliponaxis    = False,
     ))
 

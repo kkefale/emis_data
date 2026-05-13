@@ -319,23 +319,121 @@ if light_mode:
     --amber:     #b45309;
     --green:     #16a34a;
 }
-.stApp { background-color: var(--bg) !important; }
-[data-testid="stSidebar"] {
-    background: var(--bg) !important;
-    border-right: 1px solid var(--border) !important;
+
+/* ── App shell ── */
+.stApp { background-color: #f4f5f7 !important; }
+[data-testid="stMain"],
+[data-testid="stAppViewContainer"] { background-color: #f4f5f7 !important; }
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"],
+[data-testid="stSidebarContent"] {
+    background: #f4f5f7 !important;
+    border-right: 1px solid rgba(0,0,0,0.09) !important;
 }
+
+/* ── All text in sidebar & main ── */
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {
+    color: #111827 !important;
+}
+
+/* ── Widget labels ── */
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] *,
+[data-testid="stWidgetLabel"] p { color: #4b5563 !important; }
+
+/* ── Multiselect & select boxes ── */
+[data-baseweb="select"] > div { background-color: #ffffff !important; border-color: rgba(0,0,0,0.15) !important; }
+[data-baseweb="select"] span,
+[data-baseweb="select"] input,
+[data-baseweb="select"] [data-testid="stMultiSelectOption"],
+[data-baseweb="select"] div { color: #111827 !important; }
+
+/* Selected tags */
+[data-baseweb="tag"] { background-color: #dbeafe !important; }
+[data-baseweb="tag"] span { color: #1d4ed8 !important; }
+
+/* Placeholder */
+[data-baseweb="select"] input::placeholder { color: #9ca3af !important; }
+
+/* Dropdown menu */
+[data-baseweb="popover"],
+[data-baseweb="menu"],
+[role="listbox"] { background-color: #ffffff !important; border-color: rgba(0,0,0,0.12) !important; }
+[data-baseweb="menu"] li,
+[data-baseweb="menu"] li span,
+[data-baseweb="menu"] [role="option"] { color: #111827 !important; background-color: #ffffff !important; }
+[data-baseweb="menu"] li:hover,
+[data-baseweb="menu"] [role="option"]:hover { background-color: #eff6ff !important; }
+
+/* ── Radio buttons ── */
+[data-testid="stRadio"] label,
+[data-testid="stRadio"] label span,
+[data-testid="stRadio"] [data-testid="stWidgetLabel"] p { color: #111827 !important; }
+
+/* ── Toggle ── */
+[data-testid="stToggle"] label,
+[data-testid="stToggle"] label span,
+[data-testid="stToggle"] p { color: #111827 !important; }
+
+/* ── Horizontal rules ── */
+[data-testid="stSidebar"] hr { border-color: rgba(0,0,0,0.1) !important; }
+
+/* ── Main content text (outside custom HTML) ── */
+[data-testid="stMain"] p,
+[data-testid="stMain"] span,
+[data-testid="stMain"] label,
+[data-testid="stMain"] [data-testid="stMarkdownContainer"],
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] span { color: #111827 !important; }
+
+/* ── KPI card values & labels ── */
+.kpi-value { color: #111827 !important; }
+.kpi-label { color: #4b5563 !important; }
+
+/* ── Section titles ── */
+.sec-title { color: #4b5563 !important; }
+.sec-title::before { background: #1d6ed8 !important; }
+.sec-title::after  { background: rgba(0,0,0,0.10) !important; }
+
+/* ── Header ── */
+.emis-header { border-bottom-color: rgba(0,0,0,0.09) !important; }
+.emis-header h1 { color: #111827 !important; }
+.emis-header h1 span { color: #1d6ed8 !important; }
+.emis-header p  { color: #9ca3af !important; }
+
+/* ── KPI card borders ── */
+.kpi-grid { background: rgba(0,0,0,0.06) !important; border-color: rgba(0,0,0,0.06) !important; }
+.kpi-card { background: #ffffff !important; }
+.kpi-card:hover { background: #f0f5ff !important; }
+.kpi-card { border-left-color: #1d6ed8 !important; }
+.kpi-card.accent { border-left-color: #b45309 !important; }
+.kpi-card.green  { border-left-color: #16a34a !important; }
+.kpi-card.red    { border-left-color: #dc2626 !important; }
+
+/* ── Footer ── */
+.emis-footer { color: #9ca3af !important; border-top-color: rgba(0,0,0,0.09) !important; }
+
+/* ── Empty state ── */
+.emis-empty { color: #6b7280 !important; border-color: rgba(0,0,0,0.09) !important; }
+
+/* ── Chart wrapper ── */
 [data-testid="stPlotlyChart"] {
-    background: var(--surface) !important;
-    border: 1px solid var(--border) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.09) !important;
 }
-/* Streamlit native widget backgrounds */
-[data-baseweb="select"] > div,
-[data-baseweb="input"] > div {
-    background-color: var(--surface) !important;
-    border-color: var(--border) !important;
-    color: var(--text) !important;
-}
-[data-baseweb="popover"] { background-color: var(--surface) !important; }
+
+/* ── Spinner text ── */
+[data-testid="stSpinner"] p { color: #4b5563 !important; }
 </style>
 """,
         unsafe_allow_html=True,
@@ -415,7 +513,7 @@ st.plotly_chart(
 st.markdown('<div class="sec-title">02 &mdash; Socio-Economic &amp; Resource Analysis</div>',
             unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3, gap="medium")
+col1, col2 = st.columns(2, gap="large")
 
 with col1:
     st.plotly_chart(
@@ -431,12 +529,11 @@ with col2:
         config = {"displayModeBar": False},
     )
 
-with col3:
-    st.plotly_chart(
-        ler_scatter(df, dark=not light_mode),
-        width="stretch",
-        config = {"displayModeBar": False},
-    )
+st.plotly_chart(
+    ler_scatter(df, dark=not light_mode),
+    width="stretch",
+    config = {"displayModeBar": False},
+)
 
 # ── Province comparison bar ───────────────────────────────────────────────────
 st.markdown('<div class="sec-title">03 &mdash; Province Comparison</div>', unsafe_allow_html=True)
