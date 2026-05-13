@@ -1,12 +1,12 @@
-# 🎓 SA EMIS National Schools Dashboard
+# SA EMIS — National Schools Intelligence Dashboard
 
-A **next-generation, fully interactive data exploration dashboard** for the South African National Education Management Information System (EMIS) dataset. Built with Streamlit and Plotly, it lets analysts, researchers, and policymakers explore over **25,000 schools** across all nine provinces through a high-performance dark-mode interface.
+**Version 1.3.0** · South African Department of Basic Education · 2025 Data Year
 
-![Dashboard preview — dark glassmorphism UI with map, KPI banner, sunburst, scatter and donut charts](https://placehold.co/1200x600/0a0a14/6366f1?text=SA+EMIS+Dashboard+Preview)
+An interactive data exploration dashboard for the South African National Education Management Information System (EMIS). Covers **25,527 schools** across all nine provinces with cross-filtering, a geospatial map, and full dark/light mode support.
 
 ---
 
-## ✨ Features
+## Features
 
 ### KPI Banner
 Six live metric cards update instantly with every filter change:
@@ -16,25 +16,28 @@ Six live metric cards update instantly with every filter change:
 | Total Schools | Count of open schools matching active filters |
 | Total Learners | Sum of `Learners2025` |
 | Total Educators | Sum of `Educators2025` |
-| Avg. LER | National Learner-to-Educator Ratio |
+| Avg. LER | Learner-to-Educator Ratio |
 | % No-Fee Schools | Share of schools where fees are waived |
 | Critical LER | Schools where LER > 40 (resource-strained) |
 
-### 📍 Geospatial Map
-- All schools plotted on a dark **Carto mapbox** basemap
-- Marker **size** scaled to learner enrolment (√ normalised)
-- Marker **colour** switchable between Quintile (Q1–Q5) and School Phase
-- Rich hover tooltips: school name, district, learners, educators, derived LER
+### 01 — School Locations
+- All schools plotted on a Carto mapbox basemap (dark/light tile set matched to theme)
+- Marker size scaled to learner enrolment (√ normalised)
+- Marker colour switchable between Quintile (Q1–Q5) and School Phase
+- Hover tooltips: school name, district, learners, educators, derived LER
 
-### 🔬 Socio-Economic Analysis
+### 02 — Socio-Economic & Resource Analysis
+
 | Chart | What it shows |
 |-------|---------------|
-| **Sunburst** | Province → Quintile hierarchy, sized by school count |
-| **Dual Donut** | No-Fee vs Fee-Charging for Public vs Independent sectors |
-| **LER Scatter** | Learners vs Educators with LER = 30 and LER = 40 reference lines; colour-coded by strain level |
-| **Province Bar** | Horizontal bar switchable between Learners / Educators / Schools |
+| Sunburst (Province → Quintile) | School count hierarchy; sized by school count, coloured by quintile |
+| Dual Donut (No-Fee by Sector) | No-Fee vs Fee-Charging split for Public vs Independent sectors |
+| LER Scatter | Learners vs Educators scatter with LER = 30 and LER = 40 reference lines; colour-coded by strain level |
 
-### 🔍 Cross-Filtering Sidebar
+### 03 — Province Comparison
+Horizontal bar chart switchable between Learners / Educators / Schools per province.
+
+### Cross-Filtering Sidebar
 All charts respond simultaneously to:
 - Province (cascades to District options)
 - District
@@ -42,37 +45,40 @@ All charts respond simultaneously to:
 - School Phase (Primary, Secondary, Combined, …)
 - Quintile (Q1 – Q5)
 
+### Dark / Light Mode
+Toggle in the sidebar switches the full interface — shell, charts, and map — between a precision dark theme and a high-contrast light theme.
+
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 sa-emis-dashboard/
-├── app.py              # Streamlit entrypoint — layout, KPIs, sidebar
+├── app.py              # Streamlit entrypoint — layout, KPIs, sidebar, CSS
 ├── db.py               # Database access layer — SQL queries, @st.cache_data
 ├── charts.py           # Plotly figure builders (one function per chart)
 ├── setup.py            # One-time CSV → SQLite conversion script
 ├── requirements.txt    # Python dependencies
 ├── emis.csv            # Source dataset (SA DBE EMIS 2025, semicolon-delimited)
 ├── .streamlit/
-│   └── config.toml     # Dark theme & server settings
+│   └── config.toml     # Base theme & server settings
 └── .gitignore
 ```
 
-> `emis.db` is not committed — it is **generated locally** by `setup.py` (see Quick Start below).
+> `emis.db` is not committed — it is generated locally by `setup.py` (see Quick Start below).
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-### 1 — Clone the repository
+**1 — Clone the repository**
 
 ```bash
 git clone https://github.com/<your-username>/sa-emis-dashboard.git
 cd sa-emis-dashboard
 ```
 
-### 2 — Create and activate a virtual environment
+**2 — Create and activate a virtual environment**
 
 ```bash
 python3 -m venv venv
@@ -80,53 +86,52 @@ source venv/bin/activate        # macOS / Linux
 # venv\Scripts\activate         # Windows PowerShell
 ```
 
-### 3 — Install dependencies
+**3 — Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4 — Build the SQLite database
+**4 — Build the SQLite database**
 
 ```bash
 python setup.py
 ```
 
-This reads `emis.csv` and creates `emis.db` (~13 MB) with optimised indexes. It only needs to be run once.
+Reads `emis.csv` and writes `emis.db` (~13 MB) with WAL mode and four indexes. Run once only.
 
-### 5 — Launch the dashboard
+**5 — Launch the dashboard**
 
 ```bash
 streamlit run app.py
 ```
 
-The app opens automatically at **http://localhost:8501**.
+Opens at **http://localhost:8501**.
 
 ---
 
-## 🛠️ Requirements
+## Requirements
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `streamlit` | ≥ 1.35 | Web UI framework |
-| `pandas` | ≥ 2.2 | DataFrame manipulation |
-| `plotly` | ≥ 5.20 | Interactive charts & map |
+| Package | Min version | Purpose |
+|---------|-------------|---------|
+| `streamlit` | 1.35 | Web UI framework |
+| `pandas` | 2.2 | DataFrame manipulation |
+| `plotly` | 5.20 | Interactive charts & map |
 
-Python **3.10+** required. Tested on macOS (Apple Silicon) with Python 3.14.
+Python **3.10+** required. Developed and tested on macOS Apple Silicon with Python 3.14.
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 **Source:** South African Department of Basic Education (DBE) — EMIS 2025  
 **URL:** https://www.education.gov.za/Informationfor/EducationManagementInformationSystem.aspx  
 **Rows:** 25,527 schools  
-**Key fields:** NatEmis, Province, EIDistrict, Phase_PED, Sector, Quintile, NoFeeSchool, Urban_Rural, Learners2025, Educators2025, GIS_Long, GIS_Lat
+**Key fields:** `NatEmis`, `Province`, `EIDistrict`, `Phase_PED`, `Sector`, `Quintile`, `NoFeeSchool`, `Urban_Rural`, `Learners2025`, `Educators2025`, `GIS_Long`, `GIS_Lat`
 
-The dataset is a **public government dataset** published by the South African DBE. It does not contain personally identifiable information.
+Public government dataset — no personally identifiable information.
 
-### Data normalisation applied
-The raw CSV has several inconsistencies handled transparently in `db.py`:
+### Data normalisation applied in `db.py`
 
 | Issue | Fix |
 |-------|-----|
@@ -138,61 +143,91 @@ The raw CSV has several inconsistencies handled transparently in `db.py`:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         app.py                              │
-│  (Layout · KPI cards · Sidebar filters · Chart placement)   │
+│  Layout · KPI cards · Sidebar filters · CSS theme engine    │
 ├──────────────────────┬──────────────────────────────────────┤
-│       db.py          │            charts.py                  │
-│  SQLite queries      │  Plotly figure builders               │
-│  @st.cache_data      │  scatter_map()                        │
-│  load_filtered_data  │  sunburst_province_quintile()         │
-│  get_provinces()     │  donut_no_fee_by_sector()             │
-│  get_districts()     │  ler_scatter()                        │
-│  get_phases()        │  province_bar()                       │
+│       db.py          │            charts.py                 │
+│  SQLite queries      │  Plotly figure builders              │
+│  @st.cache_data      │  scatter_map()                       │
+│  load_filtered_data  │  sunburst_province_quintile()        │
+│  get_provinces()     │  donut_no_fee_by_sector()            │
+│  get_districts()     │  ler_scatter()                       │
+│  get_phases()        │  province_bar()                      │
 └──────────────────────┴──────────────────────────────────────┘
                          ↕
                       emis.db
-              (SQLite · ~13 MB · WAL mode)
+              (SQLite · ~13 MB · WAL mode · 4 indexes)
 ```
 
-All data loading is **SQL-aggregated first**, minimising the volume of data transferred to pandas/Plotly. `@st.cache_data(ttl=600)` ensures repeated filter interactions are served from memory.
+All data loading is SQL-aggregated before reaching pandas/Plotly. `@st.cache_data(ttl=600)` serves repeated filter interactions from memory.
 
 ---
 
-## 🎨 Design System
+## Design System — Brutalist Data Terminal
 
-| Token | Value |
-|-------|-------|
-| Background | `#0a0a14` |
-| Surface | `#13131f` |
-| Grid lines | `#1e1e2e` |
-| Primary accent | `#6366f1` (Indigo) |
-| Text | `#e2e8f0` |
-| Muted text | `#94a3b8` |
-| Critical (LER > 40) | `#ef4444` |
-| Q1 (most disadvantaged) | `#ef4444` → Q5 `#22c55e` |
+Inspired by Bloomberg Terminal and Linear.app: monospace type, tight grids, no decoration.
 
-Cards use **glassmorphism** (`backdrop-filter: blur`), subtle gradient borders, and lift-on-hover transitions injected via Streamlit's `st.markdown` unsafe HTML escape hatch.
+| Token | Dark | Light |
+|-------|------|-------|
+| Background | `#0c0c0f` | `#f4f5f7` |
+| Surface | `#111116` | `#ffffff` |
+| Primary accent | `#4d9fff` | `#1d6ed8` |
+| Text | `#f0f0f0` | `#111827` |
+| Muted text | `#8a8fa8` | `#6b7280` |
+| Red / Critical | `#e05252` | `#e05252` |
+| Green / Healthy | `#4eba7f` | `#4eba7f` |
+| Typeface | IBM Plex Mono + IBM Plex Sans | |
+
+CSS variables are defined in a single `:root` block and overridden wholesale by the light-mode injection block. All Plotly charts receive explicit `paper_bgcolor` / `plot_bgcolor` / `hoverlabel` values per theme.
 
 ---
 
-## 🤝 Contributing
+## Changelog
+
+### v1.3.0 — 2026-05-13
+- Section 02 layout changed from 3-column cramped row to 2-row layout (sunburst + donut side-by-side, LER scatter full-width)
+- Explicit chart heights added (sunburst/donut 460 px, LER scatter 400 px)
+- Light mode: explicit `paper_bgcolor` / `plot_bgcolor` on all charts (eliminates dark-config bleed-through)
+- Light mode: `hoverlabel` colours set explicitly on all charts
+- Light mode: axis tick/title colours darkened to `#374151`; bar labels and donut annotations to `#374151`
+- Light mode: KPI cards, section titles, header, footer — all custom HTML elements receive explicit CSS overrides
+
+### v1.2.0 — 2026-05-13
+- Dark / light mode toggle added to sidebar
+- Full CSS variable overrides for light mode: sidebar widgets, select boxes, tags, radio buttons, captions
+- All `use_container_width=True` replaced with `width="stretch"` (Streamlit 1.40+ API)
+
+### v1.1.0 — 2026-05-13
+- Brutalist Data Terminal redesign (replaced initial sci-fi glassmorphism aesthetic)
+- IBM Plex Mono + IBM Plex Sans typeface via Google Fonts
+- CSS custom-property token system (`--bg`, `--surface`, `--signal`, `--text`, etc.)
+- Plotly palette constants: `QUINTILE_COLORS`, `PROVINCE_PALETTE`, `LER_COLORS`, `NO_FEE_COLORS`
+- `_make_layout()` / `_style_axes()` helpers centralise chart theme application
+
+### v1.0.0 — 2026-05-13
+- Initial release: CSV → SQLite pipeline (`setup.py`), data access layer (`db.py`), Plotly chart builders (`charts.py`), Streamlit app (`app.py`)
+- 25,527 schools · 9 provinces · geospatial map, sunburst, dual donut, LER scatter, province bar
+
+---
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit your changes: `git commit -m 'feat: add my feature'`
+3. Commit: `git commit -m 'feat: add my feature'`
 4. Push and open a Pull Request
 
-Please follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
+Follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
 
 ---
 
-## 📄 Licence
+## Licence
 
-This project is licensed under the **MIT Licence** — see [LICENSE](LICENSE) for details.
+MIT Licence — see [LICENSE](LICENSE) for details.
 
 The EMIS dataset is published by the South African Department of Basic Education under open government data principles.
 
