@@ -384,7 +384,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.caption("Data: SA EMIS 2025 · Schools with OPEN status only")
+    st.caption("Data: [SA EMIS 2025](https://www.education.gov.za/Programmes/EMIS/EMISDownloads.aspx) · Schools with OPEN status only")
 
     st.markdown("---")
     story_mode = st.toggle("📖 Enable Story Mode", value=False, key="story_mode_toggle")
@@ -681,7 +681,9 @@ st.plotly_chart(
 st.markdown(
     "<div class='emis-footer'>"
     "<span>SA EMIS &mdash; 2025 Data Year</span>"
-    "<span>Source: Department of Basic Education</span>"
+    "<span>Source: <a href='https://www.education.gov.za/Programmes/EMIS/EMISDownloads.aspx' "
+    "target='_blank' rel='noopener noreferrer' "
+    "style='color:inherit;text-decoration:underline;text-underline-offset:3px;'>Dept. of Basic Education &mdash; EMIS Downloads</a></span>"
     "</div>",
     unsafe_allow_html=True,
 )
