@@ -46,7 +46,7 @@ st.markdown(
     --border:    rgba(255, 255, 255, 0.07);
     --text:      #f0f0f0;
     --text-2:    #8a8fa8;
-    --text-3:    #3d4352;
+    --text-3:    #6b7280;
     --red:       #e05252;
     --amber:     #d4a843;
     --green:     #4eba7f;
@@ -245,6 +245,37 @@ html, body, [class*="css"] {
     font-weight: 600;
 }
 
+/* ─── Filter tags (active-filter summary in header) ─────────────────────── */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+}
+.filter-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--signal);
+    background: var(--signal-d);
+    border: 1px solid rgba(77, 159, 255, 0.25);
+    padding: 0.15rem 0.55rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 2px;
+}
+
+/* ─── KPI delta ──────────────────────────────────────────────────────────── */
+.kpi-delta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    margin-top: 0.35rem;
+    display: block;
+}
+.kpi-delta.worse   { color: var(--red); }
+.kpi-delta.better  { color: var(--green); }
+.kpi-delta.neutral { color: var(--text-2); }
+
 /* ─── Mobile ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     /* Tighter outer padding */
@@ -318,6 +349,22 @@ html, body, [class*="css"] {
 with st.sidebar:
     st.markdown("## 🔍 Filters")
 
+    # ── Display toggles visible at the very top ───────────────────────────────
+    _tc1, _tc2 = st.columns(2)
+    with _tc1:
+        story_mode = st.toggle("📖 Story", value=False, key="story_mode_toggle")
+    with _tc2:
+        light_mode = st.toggle("☀️ Light", value=False, key="theme_toggle")
+
+    # ── Reset all filters ─────────────────────────────────────────────────────
+    if st.button("↺  Reset all filters", use_container_width=True):
+        for _k in ["f_province", "f_district", "f_sector",
+                   "f_phase", "f_quintile", "f_urban_rural"]:
+            st.session_state[_k] = []
+        st.rerun()
+
+    st.markdown("---")
+
     all_provinces = get_provinces()
     sel_provinces = st.multiselect(
         "Province",
@@ -328,7 +375,7 @@ with st.sidebar:
 
     all_districts = get_districts(tuple(sel_provinces) if sel_provinces else None)
     sel_districts = st.multiselect(
-        "District",
+        f"District  ({len(all_districts)} available)",
         options     = all_districts,
         placeholder = "All districts",
         key         = "f_district",
@@ -386,9 +433,21 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Data: [SA EMIS 2025](https://www.education.gov.za/Programmes/EMIS/EMISDownloads.aspx) · Schools with OPEN status only")
 
-    st.markdown("---")
-    story_mode = st.toggle("📖 Enable Story Mode", value=False, key="story_mode_toggle")
-    light_mode = st.toggle("Light mode", value=False, key="theme_toggle")
+
+# ── Active-filter summary tokens (used in header and export) ─────────────────
+_active: list[str] = []
+if sel_provinces:
+    _active += sel_provinces
+if sel_districts:
+    _active.append(f"{len(sel_districts)} district{'s' if len(sel_districts) > 1 else ''}")
+if sel_sectors:
+    _active += [s.title() for s in sel_sectors]
+if sel_phases:
+    _active += sel_phases
+if sel_quintiles:
+    _active += sel_quintiles
+if sel_urban_rural:
+    _active += sel_urban_rural
 
 
 # ── Theme override (injected after sidebar so light_mode is available) ────────
@@ -529,10 +588,49 @@ if light_mode:
 
 /* ── Spinner text ── */
 [data-testid="stSpinner"] p { color: #4b5563 !important; }
+
+/* ── Filter tags ── */
+.filter-tag { color: #1d6ed8 !important; background: rgba(29,110,216,0.10) !important; border-color: rgba(29,110,216,0.25) !important; }
+
+/* ── KPI delta ── */
+.kpi-delta.worse   { color: #dc2626 !important; }
+.kpi-delta.better  { color: #16a34a !important; }
+.kpi-delta.neutral { color: #4b5563 !important; }
+
+/* ── Sidebar buttons ── */
+[data-testid="stSidebar"] button {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+[data-testid="stSidebar"] button:hover {
+    background-color: #eff6ff !important;
+    border-color: rgba(29,110,216,0.4) !important;
+}
+[data-testid="stDownloadButton"] button {
+    background-color: #dbeafe !important;
+    color: #1d4ed8 !important;
+    border: 1px solid rgba(29,110,216,0.25) !important;
+}
+[data-testid="stDownloadButton"] button:hover {
+    background-color: #bfdbfe !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
     )
+
+# ── Chart config constants ────────────────────────────────────────────────────
+_MAP_CFG = {
+    "displayModeBar":          "hover",
+    "scrollZoom":              True,
+    "modeBarButtonsToRemove": ["select2d", "lasso2d"],
+}
+_CHART_CFG = {
+    "displayModeBar":          "hover",
+    "scrollZoom":              False,
+    "modeBarButtonsToRemove": ["select2d", "lasso2d", "autoScale2d"],
+}
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 with st.spinner("Loading data…"):
@@ -545,11 +643,41 @@ with st.spinner("Loading data…"):
         urban_rural = tuple(sel_urban_rural) if sel_urban_rural else None,
     )
 
+# ── National baseline KPIs (for deltas — cached, no extra DB hit) ─────────────
+_any_filter = bool(
+    sel_provinces or sel_districts or sel_sectors
+    or sel_phases or sel_quintiles or sel_urban_rural
+)
+if _any_filter:
+    _nat_df   = load_filtered_data()   # no-arg call is independently cached
+    nat_kpis  = compute_kpis(_nat_df)
+else:
+    nat_kpis  = None
+
+# ── Sidebar: CSV export (placed here because it needs df) ─────────────────────
+with st.sidebar:
+    st.markdown("---")
+    st.download_button(
+        label               = "⬇  Export filtered data (CSV)",
+        data                = df.to_csv(index=False).encode("utf-8"),
+        file_name           = "emis_filtered.csv",
+        mime                = "text/csv",
+        use_container_width = True,
+    )
+
 # ── Header ────────────────────────────────────────────────────────────────────
+_filter_tags_html = ""
+if _active:
+    _tags = "".join(f'<span class="filter-tag">{t}</span>' for t in _active)
+    _filter_tags_html = f'<div class="filter-tags">{_tags}</div>'
+
 st.markdown(
-    """
+    f"""
     <div class="emis-header">
-      <h1>SA EMIS &mdash; <span>National Schools Intelligence</span></h1>
+      <div>
+        <h1>SA EMIS &mdash; <span>National Schools Intelligence</span></h1>
+        {_filter_tags_html}
+      </div>
       <p>Dept. of Basic Education &middot; 2025 Data Year</p>
     </div>
     """,
@@ -563,6 +691,27 @@ if df.empty:
     st.stop()
 
 kpis = compute_kpis(df)
+
+# ── KPI delta strings (shown when filters are active) ────────────────────────
+if nat_kpis:
+    _ler_diff = round(kpis["national_ler"] - nat_kpis["national_ler"], 1)
+    if abs(_ler_diff) < 0.1:
+        _ler_delta = '<span class="kpi-delta neutral">≈ national avg</span>'
+    elif _ler_diff > 0:
+        _ler_delta = f'<span class="kpi-delta worse">▲ +{_ler_diff} vs national</span>'
+    else:
+        _ler_delta = f'<span class="kpi-delta better">▼ {_ler_diff} vs national</span>'
+
+    _nf_diff = round(kpis["no_fee_pct"] - nat_kpis["no_fee_pct"], 1)
+    if abs(_nf_diff) < 0.1:
+        _nf_delta = '<span class="kpi-delta neutral">≈ national avg</span>'
+    elif _nf_diff > 0:
+        _nf_delta = f'<span class="kpi-delta better">▲ +{_nf_diff}% vs national</span>'
+    else:
+        _nf_delta = f'<span class="kpi-delta worse">▼ {_nf_diff}% vs national</span>'
+else:
+    _ler_delta = ""
+    _nf_delta  = ""
 
 st.markdown(
     f"""
@@ -582,10 +731,12 @@ st.markdown(
       <div class="kpi-card accent">
         <span class="kpi-value">{kpis["national_ler"]}</span>
         <span class="kpi-label">Learner / Educator Ratio</span>
+        {_ler_delta}
       </div>
       <div class="kpi-card green">
         <span class="kpi-value">{kpis["no_fee_pct"]}%</span>
         <span class="kpi-label">No-Fee Schools</span>
+        {_nf_delta}
       </div>
       <div class="kpi-card red">
         <span class="kpi-value">{kpis["critical_count"]:,}</span>
@@ -595,6 +746,28 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# ── Critical schools drilldown ────────────────────────────────────────────────
+_critical = df[df["LER_strain"] == "Critical (>40)"].copy()
+if not _critical.empty:
+    with st.expander(
+        f"🔴 {len(_critical):,} Critical Schools (LER > 40) — click to view",
+        expanded=False,
+    ):
+        _disp = (
+            _critical[["school_name", "Province", "EIDistrict", "Quintile",
+                        "Urban_Rural", "Learners2025", "Educators2025", "LER"]]
+            .sort_values("LER", ascending=False)
+            .rename(columns={
+                "school_name":   "School",
+                "EIDistrict":    "District",
+                "Urban_Rural":   "Urban/Rural",
+                "Learners2025":  "Learners",
+                "Educators2025": "Educators",
+            })
+            .reset_index(drop=True)
+        )
+        st.dataframe(_disp, use_container_width=True, height=400)
 
 # ── Map ───────────────────────────────────────────────────────────────────────
 st.markdown('<div class="sec-title">01 &mdash; School Locations</div>', unsafe_allow_html=True)
@@ -613,8 +786,7 @@ if story_mode:
 st.plotly_chart(
     scatter_map(df, color_by=color_by, dark=not light_mode),
     width="stretch",
-    config = {"displayModeBar": True, "scrollZoom": True,
-              "modeBarButtonsToRemove": ["select2d", "lasso2d"]},
+    config=_MAP_CFG,
 )
 
 # ── Analysis row (3 columns) ──────────────────────────────────────────────────
@@ -638,25 +810,40 @@ with col1:
     st.plotly_chart(
         sunburst_province_quintile(df, dark=not light_mode),
         width="stretch",
-        config = {"displayModeBar": False},
+        config=_CHART_CFG,
     )
-    st.plotly_chart(
-        quintile_ler_bar(df, dark=not light_mode),
-        width="stretch",
-        config = {"displayModeBar": False},
-    )
+    if df["Quintile"].isin(["Q1", "Q2", "Q3", "Q4", "Q5"]).any():
+        st.plotly_chart(
+            quintile_ler_bar(df, dark=not light_mode),
+            width="stretch",
+            config=_CHART_CFG,
+        )
+    else:
+        st.caption("No quintile data for the current selection.")
 
 with col2:
-    st.plotly_chart(
-        donut_no_fee_by_sector(df, dark=not light_mode),
-        width="stretch",
-        config = {"displayModeBar": False},
-    )
-    st.plotly_chart(
-        ler_scatter(df, dark=not light_mode),
-        width="stretch",
-        config = {"displayModeBar": False},
-    )
+    if df["Sector"].isin(["PUBLIC", "INDEPENDENT"]).any():
+        st.plotly_chart(
+            donut_no_fee_by_sector(df, dark=not light_mode),
+            width="stretch",
+            config=_CHART_CFG,
+        )
+    else:
+        st.caption("No sector data for the current selection.")
+
+    _has_ler = (
+        df["Learners2025"].notna()
+        & df["Educators2025"].notna()
+        & (df["Educators2025"] > 0)
+    ).any()
+    if _has_ler:
+        st.plotly_chart(
+            ler_scatter(df, dark=not light_mode),
+            width="stretch",
+            config=_CHART_CFG,
+        )
+    else:
+        st.caption("Insufficient educator/learner data for LER scatter.")
 
 # ── Province comparison bar ───────────────────────────────────────────────────
 st.markdown('<div class="sec-title">03 &mdash; Province Comparison</div>', unsafe_allow_html=True)
@@ -674,7 +861,7 @@ if story_mode:
 st.plotly_chart(
     province_bar(df, metric=prov_metric, dark=not light_mode),
     width="stretch",
-    config = {"displayModeBar": False},
+    config=_CHART_CFG,
 )
 
 # ── Footer ────────────────────────────────────────────────────────────────────
